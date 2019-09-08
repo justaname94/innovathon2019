@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+"""Django's manage.py."""
+
 import os
 import sys
 
@@ -23,8 +26,8 @@ if __name__ == "__main__":
         raise
 
     # This allows easy placement of apps within the interior
-    # personal_crm directory.
+    # prm directory.
     current_path = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.join(current_path, "personal_crm"))
+    sys.path.append(os.path.join(current_path, "prm"))
 
     execute_from_command_line(sys.argv)

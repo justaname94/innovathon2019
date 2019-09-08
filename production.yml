@@ -3,14 +3,14 @@ version: '3'
 volumes:
   production_postgres_data: {}
   production_postgres_data_backups: {}
-  production_traefik: {}
+  production_caddy: {}
 
 services:
   django: &django
     build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
-    image: personal_crm_production_django
+    image: prm_production_django
     depends_on:
       - postgres
       - redis
@@ -23,50 +23,44 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: personal_crm_production_postgres
+    image: prm_production_postgres
     volumes:
       - production_postgres_data:/var/lib/postgresql/data
       - production_postgres_data_backups:/backups
     env_file:
       - ./.envs/.production/.postgres
 
-  traefik:
+  caddy:
     build:
       context: .
-      dockerfile: ./compose/production/traefik/Dockerfile
-    image: personal_crm_production_traefik
+      dockerfile: ./compose/production/caddy/Dockerfile
+    image: prm_production_caddy
     depends_on:
       - django
     volumes:
-      - production_traefik:/etc/traefik/acme
+      - production_caddy:/root/.caddy
+    env_file:
+      - ./.envs/.production/.caddy
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
 
   redis:
-    image: redis:5.0
+    image: redis:3.2
 
   celeryworker:
     <<: *django
-    image: personal_crm_production_celeryworker
+    image: prm_production_celeryworker
     command: /start-celeryworker
 
   celerybeat:
     <<: *django
-    image: personal_crm_production_celerybeat
+    image: prm_production_celerybeat
     command: /start-celerybeat
 
   flower:
     <<: *django
-    image: personal_crm_production_flower
+    image: prm_production_flower
     ports:
       - "5555:5555"
     command: /start-flower
-  awscli:
-    build:
-      context: .
-      dockerfile: ./compose/production/aws/Dockerfile
-    env_file:
-      - ./.envs/.production/.django
-    volumes:
-      - production_postgres_data_backups:/backups

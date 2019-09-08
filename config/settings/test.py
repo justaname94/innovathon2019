@@ -1,38 +1,30 @@
-"""
+"""Testing settings.
+
 With these settings, tests run faster.
 """
 
-from .base import *  # noqa
+from .base import *  # NOQA
 from .base import env
 
-# GENERAL
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
-SECRET_KEY = env(
-    "DJANGO_SECRET_KEY",
-    default="P7OnFjddB87VgYsCsP0TZlIvMoqX5vmhrQFGCFttxPMaOJov4CFYeJXznIKyvFrY",
-)
-# https://docs.djangoproject.com/en/dev/ref/settings/#test-runner
+# Base
+DEBUG = False
+SECRET_KEY = env("DJANGO_SECRET_KEY", default="7lEaACt4wsCj8JbXYgQLf4BmdG5QbuHTMYUGir2Gc1GHqqb2Pv8w9iXwwlIIviI2")
 TEST_RUNNER = "django.test.runner.DiscoverRunner"
 
-# CACHES
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#caches
+# Cache
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        "LOCATION": "",
+        "LOCATION": ""
     }
 }
 
-# PASSWORDS
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#password-hashers
+# Passwords
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 
-# TEMPLATES
-# ------------------------------------------------------------------------------
-TEMPLATES[0]["OPTIONS"]["loaders"] = [  # noqa F405
+# Templates
+TEMPLATES[0]["OPTIONS"]["debug"] = DEBUG  # NOQA
+TEMPLATES[0]["OPTIONS"]["loaders"] = [  # NOQA
     (
         "django.template.loaders.cached.Loader",
         [
@@ -42,10 +34,7 @@ TEMPLATES[0]["OPTIONS"]["loaders"] = [  # noqa F405
     )
 ]
 
-# EMAIL
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
+# Email
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
-
-# Your stuff...
-# ------------------------------------------------------------------------------
+EMAIL_HOST = "localhost"
+EMAIL_PORT = 1025

@@ -9,7 +9,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
-    image: personal_crm_local_django
+    image: prm_local_django
     depends_on:
       - postgres
     volumes:
@@ -25,7 +25,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: personal_crm_production_postgres
+    image: prm_production_postgres
     volumes:
       - local_postgres_data:/var/lib/postgresql/data
       - local_postgres_data_backups:/backups
@@ -33,11 +33,11 @@ services:
       - ./.envs/.local/.postgres
 
   redis:
-    image: redis:5.0
+    image: redis:3.2
 
   celeryworker:
     <<: *django
-    image: personal_crm_local_celeryworker
+    image: prm_local_celeryworker
     depends_on:
       - redis
       - postgres
@@ -47,7 +47,7 @@ services:
 
   celerybeat:
     <<: *django
-    image: personal_crm_local_celerybeat
+    image: prm_local_celerybeat
     depends_on:
       - redis
       - postgres
@@ -57,7 +57,7 @@ services:
 
   flower:
     <<: *django
-    image: personal_crm_local_flower
+    image: prm_local_flower
     ports:
       - "5555:5555"
     command: /start-flower
