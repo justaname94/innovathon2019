@@ -22,3 +22,6 @@ class Profile(models.Model):
         help_text='Position you hold at the company/organization you work at.')
 
     biography = models.TextField(blank=True)
+
+    def __str__(self):
+        return str(self.user)

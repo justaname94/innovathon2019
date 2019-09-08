@@ -26,7 +26,7 @@ class User(AbstractUser):
         blank=True
     )
 
-    birth_date = models.DateField('Birth Date', blank=True)
+    birth_date = models.DateField('Birth Date', blank=True, null=True)
 
     USERNAME_FIELD = 'email'
 
