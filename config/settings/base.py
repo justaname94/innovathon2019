@@ -18,6 +18,9 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# Users & Authentication
+AUTH_USER_MODEL = 'users.User'
+
 # DATABASES
 DATABASES = {
     'default': env.db('DATABASE_URL'),
@@ -43,6 +46,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
 ]
 LOCAL_APPS = [
+    'prm.users.apps.UsersConfig',
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -129,7 +133,8 @@ SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 
 # Email
-EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND',
+                    default='django.core.mail.backends.smtp.EmailBackend')
 
 # Admin
 ADMIN_URL = 'admin/'
