@@ -1,4 +1,3 @@
-Comparte Ride
-=============
+# Personal CRM (PRM)
 
-Group-bounded, invite-only, carpooling platform
+CRM like platform for managing your relationships.
