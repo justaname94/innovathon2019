@@ -32,3 +32,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    class Meta(AbstractUser.Meta):
+        get_latest_by = ('date_joined',)

@@ -10,7 +10,7 @@ class Contact(Entity):
     """Represents a contact of an user and holds all the personal
        information related to them."""
 
-    user = models.ForeignKey(
+    owner = models.ForeignKey(
         'users.User',
         on_delete=models.CASCADE,
         help_text='User this contact belongs')
@@ -18,6 +18,8 @@ class Contact(Entity):
     first_name = models.CharField('First name', max_length=40)
     middle_name = models.CharField(max_length=20, blank=True)
     last_name = models.CharField(max_length=40)
+
+    email = models.EmailField(blank=True)
 
     nickname = models.CharField(
         max_length=40,
@@ -53,4 +55,4 @@ class Contact(Entity):
         help_text='Pets information, as their name, breed, etc..')
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name} of {self.user}'
+        return f'{self.first_name} {self.last_name} of {self.owner}'

@@ -39,7 +39,6 @@ class UserModelSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'phone_number',
-            'birth_date',
         )
 
 
