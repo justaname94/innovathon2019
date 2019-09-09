@@ -10,4 +10,5 @@ class ContactModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Contact
-        exclude = ('id', 'created', 'modified')
+        exclude = ('created', 'modified')
+        read_only_fields = ('id',)

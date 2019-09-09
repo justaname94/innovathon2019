@@ -14,6 +14,7 @@ from prm.users.permissions import IsAccountOwner
 
 
 class ContactsViewSet(mixins.CreateModelMixin,
+                      mixins.RetrieveModelMixin,
                       mixins.UpdateModelMixin,
                       mixins.DestroyModelMixin,
                       mixins.ListModelMixin,

@@ -26,9 +26,9 @@ import jwt
 
 
 class UserModelSerializer(serializers.ModelSerializer):
-    """User serializer"""
+    """User serializer, can also update the profile info related to the user"""
 
-    profile = ProfileModelSerializer(read_only=True)
+    profile = ProfileModelSerializer()
 
     class Meta:
         model = User
@@ -40,6 +40,15 @@ class UserModelSerializer(serializers.ModelSerializer):
             'last_name',
             'phone_number',
         )
+
+    def update(self, instance, data):
+        # Update profile info
+        profile_serializer = self.fields['profile']
+        profile = instance.profile
+        profile_data = data.pop('profile')
+        profile_serializer.update(profile, profile_data)
+
+        return super().update(instance, data)
 
 
 class UserSignUpSerializer(serializers.Serializer):

@@ -27,10 +27,13 @@ class UserViewSet(mixins.RetrieveModelMixin,
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserModelSerializer
 
+    lookup_field = 'username'
+
     def get_permissions(self):
         if self.action in ['signup', 'verify', 'login']:
             permissions = [AllowAny]
-        elif self.action in ['retrieve', 'update', 'partial_update']:
+        elif self.action in [
+                'retrieve', 'update', 'partial_update', 'profifle']:
             permissions = [IsAuthenticated, IsAccountOwner]
         else:
             permissions = [IsAuthenticated]
@@ -62,5 +65,13 @@ class UserViewSet(mixins.RetrieveModelMixin,
         data = {
             'user': UserModelSerializer(user).data,
             'token': token
+        }
+        return Response(data, status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def profile(self, request):
+        """Same as the retrieve, but does not require an id"""
+        data = {
+            'user': UserModelSerializer(self.request.user).data,
         }
         return Response(data, status.HTTP_200_OK)
