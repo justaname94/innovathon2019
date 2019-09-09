@@ -26,8 +26,6 @@ class User(AbstractUser):
         blank=True
     )
 
-    birth_date = models.DateField('Birth Date', blank=True, null=True)
-
     USERNAME_FIELD = 'email'
 
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
