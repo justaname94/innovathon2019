@@ -5,7 +5,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 # Serializers
-from ..serializers import UserModelSerializer, UserSignUpSerializer
+from ..serializers import (
+    UserModelSerializer,
+    UserSignUpSerializer,
+    UserVerificationSerializer,
+    UserLoginSerializer
+)
 
 # Models
 from ..models import User
@@ -23,7 +28,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
     serializer_class = UserModelSerializer
 
     def get_permissions(self):
-        if self.action in ['signup']:
+        if self.action in ['signup', 'verify', 'login']:
             permissions = [AllowAny]
         elif self.action in ['retrieve', 'update', 'partial_update']:
             permissions = [IsAuthenticated, IsAccountOwner]
@@ -31,17 +36,31 @@ class UserViewSet(mixins.RetrieveModelMixin,
             permissions = [IsAuthenticated]
         return [p() for p in permissions]
 
-    def get_serializer_class(self):
-        if self.action == 'signup':
-            return UserSignUpSerializer
-        return UserModelSerializer
-
     @action(detail=False, methods=['post'])
     def signup(self, request):
         """User sign up view."""
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(data=request.data)
+        serializer = UserSignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         data = UserModelSerializer(user).data
+        return Response(data, status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def verify(self, request):
+        """User verification by jwt token view."""
+        serializer = UserVerificationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        data = {'message': 'You have been sucessfully verified'}
+        return Response(data, status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def login(self, request):
+        serializer = UserLoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user, token = serializer.save()
+        data = {
+            'user': UserModelSerializer(user).data,
+            'token': token
+        }
         return Response(data, status.HTTP_200_OK)

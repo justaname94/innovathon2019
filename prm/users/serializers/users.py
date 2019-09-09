@@ -1,6 +1,6 @@
 # Django
 from django.conf import settings
-from django.contrib.auth import password_validation
+from django.contrib.auth import password_validation, authenticate
 from django.core.mail import EmailMultiAlternatives
 from django.core.validators import RegexValidator
 from django.template.loader import render_to_string
@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 # Models
 from ..models import User
 from ..models import Profile
+from rest_framework.authtoken.models import Token
 
 # Serializers
 from .profiles import ProfileModelSerializer
@@ -74,7 +75,7 @@ class UserSignUpSerializer(serializers.Serializer):
         password = data['password']
         password_conf = data['password_confirmation']
         if password != password_conf:
-            serializers.ValidationError("Passwords mismatch")
+            raise serializers.ValidationError("Passwords mismatch")
         # Check if password is strong enough
         password_validation.validate_password(password)
         return data
@@ -93,7 +94,8 @@ class UserSignUpSerializer(serializers.Serializer):
         from_email = 'Personal CRM <noreply@prm.com>'
         content = render_to_string('emails/users/register_confirmation.html', {
             'user': user,
-            'token': token
+            'token': token,
+            'type': 'email_confirmation',
         })
         message = EmailMultiAlternatives(
             subject, content, from_email, [user.email])
@@ -109,3 +111,50 @@ class UserSignUpSerializer(serializers.Serializer):
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
         return token.decode()
+
+
+class UserVerificationSerializer(serializers.Serializer):
+    token = serializers.CharField()
+
+    def validate(self, data):
+        """Verify the user has provided a valid token"""
+        try:
+            payload = jwt.decode(
+                data['token'], settings.SECRET_KEY, algorithms='HS256')
+        except jwt.ExpiredSignatureError:
+            raise serializers.ValidationError('token has expired')
+        except jwt.PyJWTError:
+            raise serializers.ValidationError('invalid token')
+        if payload['type'] != 'email_confirmation':
+            raise serializers.ValidationError('invalid token')
+        self.context['payload'] = payload
+        return data
+
+    def save(self):
+        payload = self.context['payload']
+        user = User.objects.get(username=payload['user'])
+        user.is_active = True
+        user.save()
+        return user
+
+
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+    def validate(self, data):
+        """Validate if this is a valid user."""
+        email = data['email']
+        password = data['password']
+        user = authenticate(username=email, password=password)
+        if not user:
+            raise serializers.ValidationError('invalid user credentials')
+        if not user.is_active:
+            raise serializers.ValidationError('User is not active yet')
+        self.context['user'] = user
+        return data
+
+    def save(self):
+        user = self.context['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return user, token.key
