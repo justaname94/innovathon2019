@@ -8,4 +8,4 @@ gunicorn==19.9.0
 django-storages[boto3]==1.7.1
 
 # Email
-django-anymail[mailgun]==5.0
+django-anymail[sendgrid]==5.0
