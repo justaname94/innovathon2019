@@ -79,7 +79,7 @@ ADMIN_URL = env('DJANGO_ADMIN_URL')
 
 # Anymail (Sendgrid)
 INSTALLED_APPS += ['anymail']  # noqa F405
-EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
+EMAIL_BACKEND = 'anymail.backends.sendgrid.EmailBackend'
 ANYMAIL = {
     'SENDGRID_API_KEY': env('SENDGRID_API_KEY')
 }

@@ -2,6 +2,7 @@
 
 # Debugging
 ipdb==0.12.2
+ptvsd==4.3.2
 
 # Tools
 django-extensions==2.2.1

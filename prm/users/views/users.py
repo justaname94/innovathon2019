@@ -33,16 +33,19 @@ class UserViewSet(mixins.RetrieveModelMixin,
         if self.action in ['signup', 'verify', 'login']:
             permissions = [AllowAny]
         elif self.action in [
-                'retrieve', 'update', 'partial_update', 'profifle']:
+                'retrieve', 'update', 'partial_update', 'profile']:
             permissions = [IsAuthenticated, IsAccountOwner]
         else:
-            permissions = [IsAuthenticated]
+            # Method not allowed
+            return []
         return [p() for p in permissions]
 
     @action(detail=False, methods=['post'])
     def signup(self, request):
         """User sign up view."""
-        serializer = UserSignUpSerializer(data=request.data)
+        serializer = UserSignUpSerializer(data=request.data, context={
+            'request': request
+        })
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         data = UserModelSerializer(user).data

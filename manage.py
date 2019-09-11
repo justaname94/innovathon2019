@@ -8,6 +8,15 @@ import sys
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
+    if os.environ.get("DJANGO_DEBUGGER", False):
+        import ptvsd
+
+        ptvsd.enable_attach(address=("0.0.0.0", 3000))
+        # Colored output
+        GREEN_SUCCESS = '\033[92m'
+        ENDCOLOR = '\033[0m'
+        print(GREEN_SUCCESS + "Attached remote debugger" + ENDCOLOR)
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError:

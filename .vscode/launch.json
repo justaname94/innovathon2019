@@ -1,0 +1,21 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [{
+    // In order to run remote debugging, you need to open a terminal and 
+    // run the project with command: 
+    // docker-compose run --rm -p 3000:3000 -p 8080:8001 django sh -c 
+    // 'DJANGO_DEBUGGER=True python manage.py runserver --noreload  0.0.0.0:8001'
+    "name": "Python: Docker Remote Attach",
+    "type": "python",
+    "request": "attach",
+    "port": 3000,
+    "host": "localhost",
+    "pathMappings": [{
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/app"
+    }]
+  }]
+}

@@ -1,9 +1,7 @@
 # Django
 from django.conf import settings
 from django.contrib.auth import password_validation, authenticate
-from django.core.mail import EmailMultiAlternatives
 from django.core.validators import RegexValidator
-from django.template.loader import render_to_string
 
 # Models
 from ..models import User
@@ -17,12 +15,11 @@ from .profiles import ProfileModelSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-# Utils
-from django.utils import timezone
-from datetime import timedelta
-
 # JWT
 import jwt
+
+# Tasks
+from ...taskapp.tasks import send_confirmation_email
 
 
 class UserModelSerializer(serializers.ModelSerializer):
@@ -93,32 +90,9 @@ class UserSignUpSerializer(serializers.Serializer):
         data.pop('password_confirmation')
         user = User.objects.create_user(**data, is_active=False)
         Profile.objects.create(user=user)
-        self.send_confirmation_email(user)
+        send_confirmation_email.delay(
+            user_pk=user.pk, host=self.context['request'].get_host())
         return user
-
-    def send_confirmation_email(self, user):
-        token = self.gen_verification_token(user)
-        subject = 'Verify your email at Personal CRM (PRM)'
-        from_email = 'Personal CRM <noreply@prm.com>'
-        content = render_to_string('emails/users/register_confirmation.html', {
-            'user': user,
-            'token': token,
-            'type': 'email_confirmation',
-        })
-        message = EmailMultiAlternatives(
-            subject, content, from_email, [user.email])
-        message.send()
-
-    def gen_verification_token(self, user):
-        """Generate JWT necessary for the user to authenticate its account"""
-        exp_date = timezone.now() + timedelta(days=3)
-        payload = {
-            'user': user.username,
-            'exp': exp_date,
-            'type': 'email_confirmation'
-        }
-        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
-        return token.decode()
 
 
 class UserVerificationSerializer(serializers.Serializer):
