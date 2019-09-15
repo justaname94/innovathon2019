@@ -109,12 +109,17 @@ class UserVerificationSerializer(serializers.Serializer):
             raise serializers.ValidationError('invalid token')
         if payload['type'] != 'email_confirmation':
             raise serializers.ValidationError('invalid token')
-        self.context['payload'] = payload
+
+        # Check if user is already active
+        user = User.objects.get(username=payload['user'])
+        if user.is_active:
+            raise serializers.ValidationError(
+                "account has already been activated")
+        self.context['user'] = user
         return data
 
     def save(self):
-        payload = self.context['payload']
-        user = User.objects.get(username=payload['user'])
+        user = self.context['user']
         user.is_active = True
         user.save()
         return user

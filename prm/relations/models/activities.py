@@ -3,6 +3,7 @@ from django.db import models
 
 # Models
 from ...utils import PRMModel
+from django_extensions.db.fields import RandomCharField
 
 
 class Activity(PRMModel):
@@ -11,6 +12,8 @@ class Activity(PRMModel):
     """
 
     owner = models.ForeignKey('users.User', on_delete=models.CASCADE)
+
+    short_id = RandomCharField(length=8, blank=False, null=False, unique=True)
 
     name = models.CharField(max_length=50)
 

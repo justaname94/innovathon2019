@@ -21,7 +21,7 @@ class ContactsViewSet(mixins.CreateModelMixin,
                       viewsets.GenericViewSet):
 
     serializer_class = ContactModelSerializer
-    permission_classses = [IsAuthenticated, IsAccountOwner]
+    permission_classes = [IsAuthenticated, IsAccountOwner]
 
     def get_queryset(self):
         return Contact.objects.filter(owner=self.request.user)

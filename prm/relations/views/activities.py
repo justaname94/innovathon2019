@@ -20,7 +20,9 @@ class ActivitiesViewSet(mixins.CreateModelMixin,
                         viewsets.GenericViewSet):
 
     serializer_class = ActivityModelSerializer
-    permission_classses = [IsAuthenticated, IsAccountOwner]
+    permission_classes = [IsAuthenticated, IsAccountOwner]
+
+    lookup_field = 'short_id'
 
     def get_queryset(self):
         return Activity.objects.filter(owner=self.request.user)
