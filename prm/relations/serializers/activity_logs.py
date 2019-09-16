@@ -2,24 +2,25 @@
 from rest_framework import serializers
 
 # Models
-from ..models import Activity
+from ..models import ActivityLog
 
 
-class ActivityModelSerializer(serializers.ModelSerializer):
+class ActivityLogModelSerializer(serializers.ModelSerializer):
     """Mood serializer"""
-    name = serializers.CharField(min_length=3)
 
-    partners = serializers.SlugRelatedField(
+    companions = serializers.SlugRelatedField(
         many=True,
         slug_field='first_name',
         read_only=True)
 
+    activity = serializers.SlugRelatedField(slug_field='name', read_only=True)
+
     class Meta:
-        model = Activity
+        model = ActivityLog
         exclude = ('owner', 'id', 'created', 'modified')
 
 
-class AddContactToActivitySerializer(serializers.Serializer):
+class AddContactToActivityLogSerializer(serializers.Serializer):
 
     """
     This serializer is purposely left empty in case additional custom validation
@@ -27,7 +28,7 @@ class AddContactToActivitySerializer(serializers.Serializer):
     """
 
     def save(self):
-        activity = self.context['activity']
+        activity_log = self.context['activity_log']
         contact = self.context['contact']
-        activity.partners.add(contact)
-        return activity
+        activity_log.companions.add(contact)
+        return activity_log
