@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 # Models
 from ..models import ActivityLog
+from ..models import Contact
 
 
 class ActivityLogModelSerializer(serializers.ModelSerializer):
@@ -22,13 +23,46 @@ class ActivityLogModelSerializer(serializers.ModelSerializer):
 
 class AddContactToActivityLogSerializer(serializers.Serializer):
 
-    """
-    This serializer is purposely left empty in case additional custom validation
-    and/or fields need to be added.
-    """
+    contact = serializers.SlugRelatedField(
+        queryset=Contact.objects.all(),
+        slug_field='code'
+    )
+
+    # TODO: Refactor validate contact logic for add and remove contact
+    # serializers on activity log
+    def validate_contact(self, contact):
+        """Validate contact is not part of activity companions"""
+        activity_log = self.context['activity_log']
+
+        if contact in activity_log.companions.all():
+            raise serializers.ValidationError(
+                'Contact is already a member of this activity log')
+        return contact
 
     def save(self):
         activity_log = self.context['activity_log']
-        contact = self.context['contact']
+        contact = self.validated_data['contact']
         activity_log.companions.add(contact)
+        return activity_log
+
+
+class RemoveContactFromActivityLogSerializer(serializers.Serializer):
+
+    contact = serializers.SlugRelatedField(
+        queryset=Contact.objects.all(),
+        slug_field='code'
+    )
+
+    def validate_contact(self, contact):
+        """Validate contact is part of activity companions"""
+        activity_log = self.context['activity_log']
+
+        if contact not in activity_log.companions.all():
+            raise serializers.ValidationError(
+                'Contact is not a member of this activity log')
+        return contact
+
+    def save(self, **kwargs):
+        activity_log = self.context['activity_log']
+        activity_log.companions.remove(self.validated_data['contact'])
         return activity_log

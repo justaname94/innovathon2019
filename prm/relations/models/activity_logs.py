@@ -10,7 +10,7 @@ class ActivityLog(PRMModel):
     an activity could be biking an a log would be a day you went biking.
     """
 
-    short_id = RandomCharField(length=8, blank=False, null=False, unique=True)
+    code = RandomCharField(length=8, blank=False, null=False, unique=True)
 
     activity = models.ForeignKey(
         'relations.Activity', on_delete=models.SET_NULL, null=True)

@@ -22,7 +22,7 @@ class ContactsViewSet(mixins.CreateModelMixin,
     serializer_class = ContactModelSerializer
     permission_classes = [IsAuthenticated, IsAccountOwner]
 
-    lookup_field = 'short_id'
+    lookup_field = 'code'
 
     def get_queryset(self):
         return Contact.objects.filter(owner=self.request.user)

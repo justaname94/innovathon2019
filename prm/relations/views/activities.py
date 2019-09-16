@@ -1,21 +1,21 @@
-# Django
-from django.shortcuts import get_object_or_404
-
 # Django REST Framework
 from rest_framework import mixins, viewsets, status
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
 
 # Serializers
 from ..serializers import (
-    ActivityModelSerializer, AddContactToActivitySerializer)
+    ActivityModelSerializer,
+    AddContactToActivitySerializer,
+    RemoveContactFromActivitySerializer)
 
 # Models
-from ..models import Activity, Contact
+from ..models import Activity
 
 # Permissions
 from rest_framework.permissions import IsAuthenticated
 from prm.users.permissions import IsAccountOwner
+
+from django.shortcuts import get_object_or_404
 
 
 class ActivitiesViewSet(mixins.CreateModelMixin,
@@ -28,14 +28,14 @@ class ActivitiesViewSet(mixins.CreateModelMixin,
     serializer_class = ActivityModelSerializer
     permission_classes = [IsAuthenticated, IsAccountOwner]
 
-    lookup_field = 'short_id'
+    lookup_field = 'code'
 
     def get_queryset(self):
         queryset = Activity.objects.filter(owner=self.request.user)
         contact = self.request.query_params.get('contact', None)
 
-        if contact is not None:
-            queryset = queryset.filter(partners__short_id=contact)
+        if contact is not None and self.action == 'list':
+            queryset = queryset.filter(partners__code=contact)
         return queryset
 
     def partial_update(self, request, *args, **kwargs):
@@ -43,44 +43,39 @@ class ActivitiesViewSet(mixins.CreateModelMixin,
             Performs a normal update and also allows to pass addition of
             contacts to activities via the contact param.
         """
-        contact_id = self.request.query_params.get('contact', None)
 
-        if contact_id is not None:
-            contact = get_object_or_404(Contact, short_id=contact_id)
+        contact_code = self.request.query_params.get('contact', None)
 
-            filter_kwargs = {self.lookup_field: self.kwargs[self.lookup_field]}
-            activity = get_object_or_404(Activity, **filter_kwargs)
-
-            serializer = AddContactToActivitySerializer(
-                context={
-                    'activity': activity,
-                    'contact': contact})
-            activity = serializer.save()
-            data = self.get_serializer(activity).data
-            return Response(data, status.HTTP_200_OK)
-        else:
+        if contact_code is None:
             return super().partial_update(request, *args, **kwargs)
+
+        activity = self.get_object()
+        serializer = AddContactToActivitySerializer(
+            data={'contact': contact_code, },
+            context={'activity': activity, })
+        serializer.is_valid(raise_exception=True)
+        activity = serializer.save()
+        data = self.get_serializer(activity).data
+        return Response(data, status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         """
             Performs a normal destroy and allows to delete an specific contact
             from an activity.
         """
-        contact_id = self.request.query_params.get('contact', None)
+        contact_code = self.request.query_params.get('contact', None)
 
-        if contact_id is not None:
-            contact = get_object_or_404(Contact, short_id=contact_id)
-
-            filter_kwargs = {self.lookup_field: self.kwargs[self.lookup_field]}
-            activity = get_object_or_404(Activity, **filter_kwargs)
-
-            if contact in activity.partners.all():
-                activity.partners.remove(contact)
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            # Contact does not have a relation with activity
-            raise NotFound()
-        else:
+        if contact_code is None:
             return super().destroy(request, *args, **kwargs)
+
+        activity = self.get_object()
+        serializer = RemoveContactFromActivitySerializer(
+            data={'contact': contact_code},
+            context={'activity': activity}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

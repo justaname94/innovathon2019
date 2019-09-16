@@ -16,7 +16,7 @@ class Activity(PRMModel):
 
     owner = models.ForeignKey('users.User', on_delete=models.CASCADE)
 
-    short_id = RandomCharField(length=8, blank=False, null=False, unique=True)
+    code = RandomCharField(length=8, blank=False, null=False, unique=True)
 
     name = models.CharField(max_length=50)
 

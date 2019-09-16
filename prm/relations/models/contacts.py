@@ -18,7 +18,7 @@ class Contact(Entity):
         on_delete=models.CASCADE,
         help_text='User this contact belongs')
 
-    short_id = RandomCharField(length=8, blank=False, null=False, unique=True)
+    code = RandomCharField(length=8, blank=False, null=False, unique=True)
 
     first_name = models.CharField('First name', max_length=40)
     middle_name = models.CharField(max_length=20, blank=True)
