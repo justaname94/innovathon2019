@@ -1,6 +1,5 @@
 # Django REST Framework
 from rest_framework import mixins, viewsets
-from rest_framework.response import Response
 
 # Serializers
 from ..serializers import ContactModelSerializer
@@ -22,6 +21,8 @@ class ContactsViewSet(mixins.CreateModelMixin,
 
     serializer_class = ContactModelSerializer
     permission_classes = [IsAuthenticated, IsAccountOwner]
+
+    lookup_field = 'short_id'
 
     def get_queryset(self):
         return Contact.objects.filter(owner=self.request.user)
