@@ -49,12 +49,18 @@ class UserViewSet(mixins.RetrieveModelMixin,
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         data = UserModelSerializer(user).data
-        return Response(data, status.HTTP_200_OK)
+        return Response(data, status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'])
     def verify(self, request):
         """User verification by jwt token view."""
-        serializer = UserVerificationSerializer(data=request.data)
+        token = self.request.query_params.get('token', None)
+
+        if token is None:
+            return Response({'token': 'Missing query parameter: token'},
+                            status.HTTP_400_BAD_REQUEST)
+
+        serializer = UserVerificationSerializer(data={'token': token})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         data = {'message': 'You have been sucessfully verified'}

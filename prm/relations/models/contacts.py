@@ -5,6 +5,9 @@ from django.core.validators import RegexValidator
 # Models
 from ...utils import Entity
 
+# Fields
+from django_extensions.db.fields import RandomCharField
+
 
 class Contact(Entity):
     """Represents a contact of an user and holds all the personal
@@ -14,6 +17,8 @@ class Contact(Entity):
         'users.User',
         on_delete=models.CASCADE,
         help_text='User this contact belongs')
+
+    code = RandomCharField(length=8, blank=False, null=False, unique=True)
 
     first_name = models.CharField('First name', max_length=40)
     middle_name = models.CharField(max_length=20, blank=True)
@@ -42,7 +47,7 @@ class Contact(Entity):
         blank=True,
         help_text=(
             'Describe how you met the contact, like'
-            'at the park or at a party'))
+            'at tahe park or at a party'))
 
     food_preferences = models.TextField(
         'Food preferences',
