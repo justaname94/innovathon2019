@@ -15,8 +15,6 @@ from ..models import Activity
 from rest_framework.permissions import IsAuthenticated
 from prm.users.permissions import IsAccountOwner
 
-from django.shortcuts import get_object_or_404
-
 
 class ActivitiesViewSet(mixins.CreateModelMixin,
                         mixins.RetrieveModelMixin,

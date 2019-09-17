@@ -49,7 +49,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         data = UserModelSerializer(user).data
-        return Response(data, status.HTTP_200_OK)
+        return Response(data, status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'])
     def verify(self, request):

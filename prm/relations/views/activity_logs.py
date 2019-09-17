@@ -6,7 +6,6 @@ from django.shortcuts import get_object_or_404
 # Django REST Framework
 from rest_framework import mixins, viewsets, status
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
 
 # Serializers
 from ..serializers import (
@@ -15,7 +14,7 @@ from ..serializers import (
     RemoveContactFromActivityLogSerializer)
 
 # Models
-from ..models import Activity, ActivityLog, Contact
+from ..models import Activity, ActivityLog
 
 # Permissions
 from rest_framework.permissions import IsAuthenticated
