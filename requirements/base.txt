@@ -32,3 +32,6 @@ pyjwt==1.7.1
 
 # Tools
 django-extensions==2.2.1
+
+# API Documentation
+drf-yasg==1.16.1

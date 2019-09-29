@@ -9,7 +9,8 @@ from ..serializers import (
     UserModelSerializer,
     UserSignUpSerializer,
     UserVerificationSerializer,
-    UserLoginSerializer
+    UserLoginSerializer,
+    UserModelTokenSerializer
 )
 
 # Models
@@ -18,6 +19,10 @@ from ..models import User
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from ..permissions import IsAccountOwner
+
+# Swagger
+from drf_yasg.utils import swagger_auto_schema, no_body
+from drf_yasg import openapi
 
 
 class UserViewSet(mixins.RetrieveModelMixin,
@@ -40,9 +45,16 @@ class UserViewSet(mixins.RetrieveModelMixin,
             return []
         return [p() for p in permissions]
 
+    @swagger_auto_schema(
+        security=[],
+        request_body=UserSignUpSerializer,
+        responses={
+            status.HTTP_201_CREATED: UserModelSerializer
+        })
     @action(detail=False, methods=['post'])
     def signup(self, request):
-        """User sign up view."""
+        """User sign up view, after successful registration, an email is sent
+           to the user with a verification token that expires on 3 days."""
         serializer = UserSignUpSerializer(data=request.data, context={
             'request': request
         })
@@ -51,6 +63,21 @@ class UserViewSet(mixins.RetrieveModelMixin,
         data = UserModelSerializer(user).data
         return Response(data, status.HTTP_201_CREATED)
 
+    # Next time I'll manually write the api documentation because
+    # this is absurd
+    @swagger_auto_schema(
+        security=[],
+        manual_parameters=[openapi.Parameter(
+            'token', openapi.IN_QUERY,
+            description="Verification token sent to user",
+            type=openapi.TYPE_STRING)],
+        request_body=no_body,
+        responses={status.HTTP_200_OK: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={'message': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='Success message')},
+        )})
     @action(detail=False, methods=['post'])
     def verify(self, request):
         """User verification by jwt token view."""
@@ -66,15 +93,17 @@ class UserViewSet(mixins.RetrieveModelMixin,
         data = {'message': 'You have been sucessfully verified'}
         return Response(data, status.HTTP_200_OK)
 
+    @swagger_auto_schema(security=[], request_body=UserLoginSerializer,
+                         responses={
+                             status.HTTP_200_OK: UserModelTokenSerializer})
     @action(detail=False, methods=['post'])
     def login(self, request):
+        """Login endpoint, returns user's info and authorization token"""
         serializer = UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user, token = serializer.save()
-        data = {
-            'user': UserModelSerializer(user).data,
-            'token': token
-        }
+        user.token = token
+        data = UserModelTokenSerializer(user).data
         return Response(data, status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])
