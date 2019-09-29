@@ -145,3 +145,20 @@ class UserLoginSerializer(serializers.Serializer):
         user = self.context['user']
         token, created = Token.objects.get_or_create(user=user)
         return user, token.key
+
+
+class UserModelTokenSerializer(UserModelSerializer):
+    """Returns user information along with authorization token"""
+    # user = UserModelSerializer()
+    token = serializers.CharField()
+
+    class Meta(UserModelSerializer.Meta):
+        fields = (
+            'profile',
+            'email',
+            'username',
+            'first_name',
+            'last_name',
+            'phone_number',
+            'token'
+        )

@@ -12,6 +12,10 @@ from ..models import Mood
 from rest_framework.permissions import IsAuthenticated
 from prm.users.permissions import IsAccountOwner
 
+# Swagger
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.openapi import Parameter, IN_QUERY, TYPE_STRING
+
 
 class MoodsViewSet(mixins.ListModelMixin,
                    mixins.CreateModelMixin,
@@ -29,8 +33,15 @@ class MoodsViewSet(mixins.ListModelMixin,
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+    @swagger_auto_schema(manual_parameters=[
+        Parameter('from', IN_QUERY,
+                  description='Beginning date of moods', type=TYPE_STRING),
+        Parameter('to', IN_QUERY,
+                  description='End date of moods', type=TYPE_STRING),
+    ])
     def list(self, request, *args, **kwargs):
-        """Check for 'from' and 'to' kwargs to return a date range of moods"""
+        """Check for 'from' and 'to' date query params to return a date range
+           of moods. Date must be formatted as "YYYY-MM-DD" """
         # TODO: Validate date fields
         if bool('from' in request.query_params) ^ \
                 bool('to' in request.query_params):

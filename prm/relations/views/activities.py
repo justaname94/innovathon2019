@@ -15,6 +15,10 @@ from ..models import Activity
 from rest_framework.permissions import IsAuthenticated
 from prm.users.permissions import IsAccountOwner
 
+# Swagger
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.openapi import Parameter, IN_QUERY, TYPE_STRING
+
 
 class ActivitiesViewSet(mixins.CreateModelMixin,
                         mixins.RetrieveModelMixin,
@@ -36,6 +40,13 @@ class ActivitiesViewSet(mixins.CreateModelMixin,
             queryset = queryset.filter(partners__code=contact)
         return queryset
 
+    @swagger_auto_schema(manual_parameters=[
+        Parameter('contact', IN_QUERY,
+                  description=(
+                      '(Optional) contact code. If present, will add '
+                      'the contact to the activities partners'),
+                  type=TYPE_STRING),
+    ])
     def partial_update(self, request, *args, **kwargs):
         """
             Performs a normal update and also allows to pass addition of
@@ -56,6 +67,13 @@ class ActivitiesViewSet(mixins.CreateModelMixin,
         data = self.get_serializer(activity).data
         return Response(data, status.HTTP_200_OK)
 
+    @swagger_auto_schema(manual_parameters=[
+        Parameter('contact', IN_QUERY,
+                  description=(
+                      '(Optional) contact code. If present, will delete '
+                      'the contact to the activities partners'),
+                  type=TYPE_STRING),
+    ])
     def destroy(self, request, *args, **kwargs):
         """
             Performs a normal destroy and allows to delete an specific contact
