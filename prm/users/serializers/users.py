@@ -39,11 +39,12 @@ class UserModelSerializer(serializers.ModelSerializer):
         )
 
     def update(self, instance, data):
-        # Update profile info
-        profile_serializer = self.fields['profile']
-        profile = instance.profile
-        profile_data = data.pop('profile')
-        profile_serializer.update(profile, profile_data)
+        # Update profile info (if there is)
+        if data.get('profile', None):
+            profile_serializer = self.fields['profile']
+            profile = instance.profile
+            profile_data = data.pop('profile')
+            profile_serializer.update(profile, profile_data)
 
         return super().update(instance, data)
 

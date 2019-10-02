@@ -10,11 +10,12 @@ from ..serializers import (
     UserSignUpSerializer,
     UserVerificationSerializer,
     UserLoginSerializer,
-    UserModelTokenSerializer
+    UserModelTokenSerializer,
+    ProfileModelSerializer
 )
 
 # Models
-from ..models import User
+from ..models import User, Profile
 
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -106,10 +107,27 @@ class UserViewSet(mixins.RetrieveModelMixin,
         data = UserModelTokenSerializer(user).data
         return Response(data, status.HTTP_200_OK)
 
-    @action(detail=False, methods=['get'])
-    def profile(self, request):
-        """Same as the retrieve, but does not require an id"""
-        data = {
-            'user': UserModelSerializer(self.request.user).data,
-        }
-        return Response(data, status.HTTP_200_OK)
+    @swagger_auto_schema(method='get', responses={
+        status.HTTP_200_OK: ProfileModelSerializer})
+    @swagger_auto_schema(
+        methods=['put', 'patch'],
+        request_body=ProfileModelSerializer,
+        responses={
+            status.HTTP_200_OK: ProfileModelSerializer})
+    @action(detail=True, methods=['get', 'put', 'patch'])
+    def profile(self, request, *args, **kwargs):
+        """Performs actions only on profile fields"""
+        print(request.method)
+        if request.method == 'GET':
+            data = ProfileModelSerializer(self.request.user).data
+
+            return Response(data, status.HTTP_200_OK)
+        elif request.method == 'PATCH' or request.method == 'PUT':
+            profile = Profile.objects.get(user=self.request.user)
+            serializer = ProfileModelSerializer(
+                profile,
+                data=request.data,
+                partial=request.method == 'PUT')
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status.HTTP_200_OK)
