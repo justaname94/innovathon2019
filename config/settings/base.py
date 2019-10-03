@@ -47,7 +47,8 @@ THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',
-    'django_extensions'
+    'django_extensions',
+    'corsheaders',
 ]
 LOCAL_APPS = [
     'prm.users.apps.UsersConfig',
@@ -83,6 +84,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'prm.middleware.MultipleProxyMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -185,3 +187,6 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
+# CORS
+CORS_ORIGIN_ALLOW_ALL = True
