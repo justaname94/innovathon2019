@@ -62,8 +62,6 @@ class UserSignUpSerializer(serializers.Serializer):
         max_length=30,
         validators=[UniqueValidator(User.objects.all())])
 
-    birth_date = serializers.DateField(required=False)
-
     phone_regex = RegexValidator(
         regex=r'\+?1?\d{9,15}$',
         message=('Phone number must be entered in the format: +999999999. Up '

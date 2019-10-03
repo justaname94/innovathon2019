@@ -38,6 +38,8 @@ urlpatterns = [
     path('', include(('prm.users.urls', 'users'), namespace='users')),
     path('', include(('prm.relations.urls', 'relations'),
                      namespace='relations')),
+    path('', include(('prm.journals.urls', 'journals'),
+                     namespace='journals')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

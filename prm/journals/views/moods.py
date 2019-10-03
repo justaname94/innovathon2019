@@ -1,6 +1,5 @@
 # Django REST Framework
-from rest_framework import mixins, viewsets, status
-from rest_framework.response import Response
+from rest_framework import mixins, viewsets
 
 # Serializers
 from ..serializers import MoodModelSerializer
@@ -16,8 +15,11 @@ from prm.users.permissions import IsAccountOwner
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg.openapi import Parameter, IN_QUERY, TYPE_STRING
 
+# Mixins
+from ...utils.mixins import ListModelFilterBetweenDatesMixin
 
-class MoodsViewSet(mixins.ListModelMixin,
+
+class MoodsViewSet(ListModelFilterBetweenDatesMixin,
                    mixins.CreateModelMixin,
                    mixins.RetrieveModelMixin,
                    viewsets.GenericViewSet):
@@ -40,23 +42,4 @@ class MoodsViewSet(mixins.ListModelMixin,
                   description='End date of moods', type=TYPE_STRING),
     ])
     def list(self, request, *args, **kwargs):
-        """Check for 'from' and 'to' date query params to return a date range
-           of moods. Date must be formatted as "YYYY-MM-DD" """
-        # TODO: Validate date fields
-        if bool('from' in request.query_params) ^ \
-                bool('to' in request.query_params):
-            return Response(
-                {'message': 'need to add from and to date params together'},
-                status=status.HTTP_400_BAD_REQUEST)
-        elif 'from' in request.query_params and 'to' in request.query_params:
-            queryset = Mood.objects.filter(
-                owner=request.user,
-                date__gte=request.query_params['from'],
-                date__lte=request.query_params['to'])
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-            serializer = self.get_serializer(queryset, many=True)
-            return Response(serializer.data)
         return super().list(request, *args, **kwargs)
