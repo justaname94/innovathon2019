@@ -46,7 +46,8 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
-    'drf_yasg'
+    'drf_yasg',
+    'django_extensions'
 ]
 LOCAL_APPS = [
     'prm.users.apps.UsersConfig',
@@ -143,10 +144,6 @@ EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND',
 
 # Admin
 ADMIN_URL = 'admin/'
-ADMINS = [
-    ("""Pablo Trinidad""", 'pablotrinidad@ciencias.unam.mx'),
-]
-MANAGERS = ADMINS
 
 # Celery
 INSTALLED_APPS += ['prm.taskapp.celery.CeleryAppConfig']

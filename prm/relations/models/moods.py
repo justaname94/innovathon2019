@@ -25,6 +25,7 @@ class Mood(PRMModel):
         (BAD, 'bad'),
         (SAD, 'sad')
     )
+    hightlights = models.CharField(max_length=200)
     mood = models.SmallIntegerField(choices=MOOD_CHOICES)
     description = models.TextField()
     date = models.DateField()

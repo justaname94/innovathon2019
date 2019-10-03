@@ -140,7 +140,7 @@ class PublicUserViewsTestCase(APITestCase):
         self.assertFalse(user.is_active)
         token = gen_verification_token(user)
 
-        token_res = self.client.post(f"{self.urls['verify']}?token={token}")
+        token_res = self.client.get(f"{self.urls['verify']}?token={token}")
         self.assertTrue(token_res.status_code, status.HTTP_200_OK)
         user = User.objects.get(**response.data)
         self.assertTrue(user.is_active)
@@ -157,7 +157,7 @@ class PublicUserViewsTestCase(APITestCase):
 
         user = User.objects.get(**response.data)
         token = gen_verification_token(user)
-        token_res = self.client.post(f"{self.urls['verify']}?token={token}")
+        token_res = self.client.get(f"{self.urls['verify']}?token={token}")
         self.assertTrue(token_res.status_code, status.HTTP_200_OK)
         login_data = {
             'email': USER_DATA['email'],

@@ -79,7 +79,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
                 type=openapi.TYPE_STRING,
                 description='Success message')},
         )})
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['get'])
     def verify(self, request):
         """User verification by jwt token view."""
         token = self.request.query_params.get('token', None)
@@ -108,18 +108,18 @@ class UserViewSet(mixins.RetrieveModelMixin,
         return Response(data, status.HTTP_200_OK)
 
     @swagger_auto_schema(method='get', responses={
-        status.HTTP_200_OK: ProfileModelSerializer})
+        status.HTTP_200_OK: UserModelSerializer})
     @swagger_auto_schema(
         methods=['put', 'patch'],
         request_body=ProfileModelSerializer,
         responses={
             status.HTTP_200_OK: ProfileModelSerializer})
-    @action(detail=True, methods=['get', 'put', 'patch'])
+    @action(detail=False, methods=['get', 'put', 'patch'])
     def profile(self, request, *args, **kwargs):
         """Performs actions only on profile fields"""
         print(request.method)
         if request.method == 'GET':
-            data = ProfileModelSerializer(self.request.user).data
+            data = UserModelSerializer(self.request.user).data
 
             return Response(data, status.HTTP_200_OK)
         elif request.method == 'PATCH' or request.method == 'PUT':
