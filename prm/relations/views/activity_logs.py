@@ -44,7 +44,8 @@ class ActivitiyLogsViewSet(mixins.CreateModelMixin,
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        queryset = ActivityLog.objects.filter(owner=self.request.user)
+        queryset = ActivityLog.objects.filter(
+            owner=self.request.user, activity__code=self.kwargs['activity'])
         contact = self.request.query_params.get('contact', None)
 
         if contact is not None and self.action == 'list':

@@ -4,9 +4,6 @@ from rest_framework import serializers
 # Models
 from ..models import Event
 
-# Utils
-from datetime import time
-
 
 class EventModelSerializer(serializers.ModelSerializer):
     """Event serializer"""
@@ -20,7 +17,12 @@ class EventModelSerializer(serializers.ModelSerializer):
         model = Event
         exclude = ('owner', 'id', 'created', 'modified')
 
-    def validate_time(self, data):
+    def validate_start_time(self, data):
+        """Discard seconds from time, leaving only hour and minutes"""
+        data = data.strftime("%H:%M")
+        return data
+
+    def validate_end_time(self, data):
         """Discard seconds from time, leaving only hour and minutes"""
         data = data.strftime("%H:%M")
         return data

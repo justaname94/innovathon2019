@@ -1,15 +1,17 @@
 # Django REST Framework
 from rest_framework import mixins, viewsets, status
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 # Serializers
 from ..serializers import (
     ActivityModelSerializer,
     AddContactToActivitySerializer,
-    RemoveContactFromActivitySerializer)
+    RemoveContactFromActivitySerializer,
+    ActivityLogModelSerializer)
 
 # Models
-from ..models import Activity
+from ..models import Activity, ActivityLog
 
 # Permissions
 from rest_framework.permissions import IsAuthenticated
@@ -92,6 +94,21 @@ class ActivitiesViewSet(mixins.CreateModelMixin,
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @swagger_auto_schema(method='get', responses={
+        status.HTTP_200_OK: ActivityLogModelSerializer})
+    @action(detail=False, methods=['get'])
+    def logs(self, request):
+        """Returns all logs from all activities"""
+        queryset = ActivityLog.objects.filter(
+            owner=self.request.user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = ActivityLogModelSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = ActivityLogModelSerializer(queryset, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

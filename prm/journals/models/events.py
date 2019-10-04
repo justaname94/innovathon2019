@@ -27,6 +27,8 @@ class Event(PRMModel):
 
     date = models.DateField()
 
-    time = models.TimeField()
+    start_time = models.TimeField()
+
+    end_time = models.TimeField()
 
     contacts = models.ManyToManyField('relations.Contact')

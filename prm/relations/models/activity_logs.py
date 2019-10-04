@@ -29,3 +29,6 @@ class ActivityLog(PRMModel):
 
     def __str__(self):
         return f'{self.activity.name} on {self.date} by {self.owner}'
+
+    class Meta:
+        ordering = ['-date', '-created']
