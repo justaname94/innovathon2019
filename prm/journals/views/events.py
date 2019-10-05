@@ -24,10 +24,10 @@ class EventsViewSet(ListModelFilterBetweenDatesMixin,
                     mixins.RetrieveModelMixin,
                     viewsets.GenericViewSet):
 
-    lookup_field = 'code'
-
     serializer_class = EventModelSerializer
-    permission_classses = [IsAuthenticated, IsAccountOwner]
+    permission_classes = [IsAuthenticated, IsAccountOwner]
+
+    lookup_field = 'code'
 
     def get_queryset(self):
         return Event.objects.filter(owner=self.request.user)

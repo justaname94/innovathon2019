@@ -27,7 +27,7 @@ class MoodsViewSet(ListModelFilterBetweenDatesMixin,
     lookup_field = 'date'
 
     serializer_class = MoodModelSerializer
-    permission_classses = [IsAuthenticated, IsAccountOwner]
+    permission_classes = [IsAuthenticated, IsAccountOwner]
 
     def get_queryset(self):
         return Mood.objects.filter(owner=self.request.user)
