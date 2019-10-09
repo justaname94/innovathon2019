@@ -22,6 +22,8 @@ from ...utils.mixins import ListModelFilterBetweenDatesMixin
 class EventsViewSet(ListModelFilterBetweenDatesMixin,
                     mixins.CreateModelMixin,
                     mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
                     viewsets.GenericViewSet):
 
     serializer_class = EventModelSerializer

@@ -26,3 +26,10 @@ class EventModelSerializer(serializers.ModelSerializer):
         """Discard seconds from time, leaving only hour and minutes"""
         data = data.strftime("%H:%M")
         return data
+
+    def validate(self, data):
+        """Ensures start_time is before end_time"""
+        if data['start_time'] > data['end_time']:
+            raise serializers.ValidationError(
+                "Start time must happen before end time")
+        return data
