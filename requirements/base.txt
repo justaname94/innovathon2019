@@ -29,7 +29,7 @@ flower==0.9.3
 tornado>=4.2.0,<6.0.0
 
 # JWT
-pyjwt==1.7.1
+pyjwt==2.4.0
 
 # Tools
 django-extensions==2.2.1
